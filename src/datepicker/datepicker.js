@@ -17,7 +17,8 @@ angular.module('ui.bootstrap.datepicker', ['ui.bootstrap.dateparser', 'ui.bootst
   yearRange: 20,
   minDate: null,
   maxDate: null,
-  shortcutPropagation: false
+  shortcutPropagation: false,
+  resetDateOnMove: false
 })
 
 .controller('UibDatepickerController', ['$scope', '$attrs', '$parse', '$interpolate', '$log', 'dateFilter', 'uibDatepickerConfig', '$datepickerSuppressError', function($scope, $attrs, $parse, $interpolate, $log, dateFilter, datepickerConfig, $datepickerSuppressError) {
@@ -62,6 +63,7 @@ angular.module('ui.bootstrap.datepicker', ['ui.bootstrap.dateparser', 'ui.bootst
 
   $scope.datepickerMode = $scope.datepickerMode || datepickerConfig.datepickerMode;
   $scope.uniqueId = 'datepicker-' + $scope.$id + '-' + Math.floor(Math.random() * 10000);
+  $scope.resetDateOnMove = $scope.resetDateOnMove || datepickerConfig.resetDateOnMove;
 
   if (angular.isDefined($attrs.initDate)) {
     this.activeDate = $scope.$parent.$eval($attrs.initDate) || new Date();
@@ -157,8 +159,12 @@ angular.module('ui.bootstrap.datepicker', ['ui.bootstrap.dateparser', 'ui.bootst
 
   $scope.move = function(direction) {
     var year = self.activeDate.getFullYear() + direction * (self.step.years || 0),
-        month = self.activeDate.getMonth() + direction * (self.step.months || 0);
-    self.activeDate.setFullYear(year, month, 1);
+      month = self.activeDate.getMonth() + direction * (self.step.months || 0),
+      date = 1;
+    if (!$scope.resetDateOnMove) {
+      date = self.activeDate.getDate();
+    }
+    self.activeDate.setFullYear(year, month, date);
     self.refreshView();
   };
 
